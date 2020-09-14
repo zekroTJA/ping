@@ -22,14 +22,14 @@
 //
 //	pinger.OnRecv = func(pkt *ping.Packet) {
 //		fmt.Printf("%d bytes from %s: icmp_seq=%d time=%v\n",
-//			pkt.Nbytes, pkt.IPAddr, pkt.Seq, pkt.Rtt)
+//			pkt.Nbytes, pkt.IPAddr, pkt.Seq, pkt.RTT)
 //	}
 //	pinger.OnFinish = func(stats *ping.Statistics) {
 //		fmt.Printf("\n--- %s ping statistics ---\n", stats.Addr)
 //		fmt.Printf("%d packets transmitted, %d packets received, %v%% packet loss\n",
 //			stats.PacketsSent, stats.PacketsRecv, stats.PacketLoss)
 //		fmt.Printf("round-trip min/avg/max/stddev = %v/%v/%v/%v\n",
-//			stats.MinRtt, stats.AvgRtt, stats.MaxRtt, stats.StdDevRtt)
+//			stats.MinRTT, stats.AvgRTT, stats.MaxRTT, stats.StdDevRTT)
 //	}
 //
 //	fmt.Printf("PING %s (%s):\n", pinger.Addr(), pinger.IPAddr())
@@ -120,7 +120,7 @@ type Pinger struct {
 	// Number of packets received
 	PacketsRecv int
 
-	// rtts is all of the Rtts
+	// rtts is all of the RTTs
 	rtts []time.Duration
 
 	// OnRecv is called when Pinger receives and processes a packet
@@ -162,8 +162,8 @@ type packet struct {
 
 // Packet represents a received and processed ICMP echo packet.
 type Packet struct {
-	// Rtt is the round-trip time it took to ping.
-	Rtt time.Duration
+	// RTT is the round-trip time it took to ping.
+	RTT time.Duration
 
 	// IPAddr is the address of the host being pinged.
 	IPAddr *net.IPAddr
@@ -178,7 +178,7 @@ type Packet struct {
 	Seq int
 
 	// TTL is the Time To Live on the packet.
-	Ttl int
+	TTL int
 }
 
 // Statistics represent the stats of a currently running or finished
@@ -199,21 +199,21 @@ type Statistics struct {
 	// Addr is the string address of the host being pinged.
 	Addr string
 
-	// Rtts is all of the round-trip times sent via this pinger.
-	Rtts []time.Duration
+	// RTTs is all of the round-trip times sent via this pinger.
+	RTTs []time.Duration
 
-	// MinRtt is the minimum round-trip time sent via this pinger.
-	MinRtt time.Duration
+	// MinRTT is the minimum round-trip time sent via this pinger.
+	MinRTT time.Duration
 
-	// MaxRtt is the maximum round-trip time sent via this pinger.
-	MaxRtt time.Duration
+	// MaxRTT is the maximum round-trip time sent via this pinger.
+	MaxRTT time.Duration
 
-	// AvgRtt is the average round-trip time sent via this pinger.
-	AvgRtt time.Duration
+	// AvgRTT is the average round-trip time sent via this pinger.
+	AvgRTT time.Duration
 
-	// StdDevRtt is the standard deviation of the round-trip times sent via
+	// StdDevRTT is the standard deviation of the round-trip times sent via
 	// this pinger.
-	StdDevRtt time.Duration
+	StdDevRTT time.Duration
 }
 
 // SetIPAddr sets the ip address of the target host.
@@ -366,6 +366,7 @@ func (p *Pinger) Run() {
 	}
 }
 
+// Stop shuts down the pinger.
 func (p *Pinger) Stop() {
 	close(p.done)
 }
@@ -401,19 +402,19 @@ func (p *Pinger) Statistics() *Statistics {
 		PacketsSent: p.PacketsSent,
 		PacketsRecv: p.PacketsRecv,
 		PacketLoss:  loss,
-		Rtts:        p.rtts,
+		RTTs:        p.rtts,
 		Addr:        p.addr,
 		IPAddr:      p.ipaddr,
-		MaxRtt:      max,
-		MinRtt:      min,
+		MaxRTT:      max,
+		MinRTT:      min,
 	}
 	if len(p.rtts) > 0 {
-		s.AvgRtt = total / time.Duration(len(p.rtts))
+		s.AvgRTT = total / time.Duration(len(p.rtts))
 		var sumsquares time.Duration
 		for _, rtt := range p.rtts {
-			sumsquares += (rtt - s.AvgRtt) * (rtt - s.AvgRtt)
+			sumsquares += (rtt - s.AvgRTT) * (rtt - s.AvgRTT)
 		}
-		s.StdDevRtt = time.Duration(math.Sqrt(
+		s.StdDevRTT = time.Duration(math.Sqrt(
 			float64(sumsquares / time.Duration(len(p.rtts)))))
 	}
 	return &s
@@ -488,7 +489,7 @@ func (p *Pinger) processPacket(recv *packet) error {
 		Nbytes: recv.nbytes,
 		IPAddr: p.ipaddr,
 		Addr:   p.addr,
-		Ttl:    recv.ttl,
+		TTL:    recv.ttl,
 	}
 
 	switch pkt := m.Body.(type) {
@@ -513,7 +514,7 @@ func (p *Pinger) processPacket(recv *packet) error {
 			return nil
 		}
 
-		outPkt.Rtt = receivedAt.Sub(timestamp)
+		outPkt.RTT = receivedAt.Sub(timestamp)
 		outPkt.Seq = pkt.Seq
 		p.PacketsRecv++
 	default:
@@ -521,7 +522,7 @@ func (p *Pinger) processPacket(recv *packet) error {
 		return fmt.Errorf("invalid ICMP echo reply; type: '%T', '%v'", pkt, pkt)
 	}
 
-	p.rtts = append(p.rtts, outPkt.Rtt)
+	p.rtts = append(p.rtts, outPkt.RTT)
 	handler := p.OnRecv
 	if handler != nil {
 		handler(outPkt)

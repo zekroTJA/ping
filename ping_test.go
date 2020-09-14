@@ -390,17 +390,17 @@ func TestStatisticsSunny(t *testing.T) {
 	if stats.PacketLoss != 0 {
 		t.Errorf("Expected %v, got %v", 0, stats.PacketLoss)
 	}
-	if stats.MinRtt != time.Duration(1000) {
-		t.Errorf("Expected %v, got %v", time.Duration(1000), stats.MinRtt)
+	if stats.MinRTT != time.Duration(1000) {
+		t.Errorf("Expected %v, got %v", time.Duration(1000), stats.MinRTT)
 	}
-	if stats.MaxRtt != time.Duration(1000) {
-		t.Errorf("Expected %v, got %v", time.Duration(1000), stats.MaxRtt)
+	if stats.MaxRTT != time.Duration(1000) {
+		t.Errorf("Expected %v, got %v", time.Duration(1000), stats.MaxRTT)
 	}
-	if stats.AvgRtt != time.Duration(1000) {
-		t.Errorf("Expected %v, got %v", time.Duration(1000), stats.AvgRtt)
+	if stats.AvgRTT != time.Duration(1000) {
+		t.Errorf("Expected %v, got %v", time.Duration(1000), stats.AvgRTT)
 	}
-	if stats.StdDevRtt != time.Duration(0) {
-		t.Errorf("Expected %v, got %v", time.Duration(0), stats.StdDevRtt)
+	if stats.StdDevRTT != time.Duration(0) {
+		t.Errorf("Expected %v, got %v", time.Duration(0), stats.StdDevRTT)
 	}
 }
 
@@ -436,17 +436,17 @@ func TestStatisticsLossy(t *testing.T) {
 	if stats.PacketLoss != 50 {
 		t.Errorf("Expected %v, got %v", 50, stats.PacketLoss)
 	}
-	if stats.MinRtt != time.Duration(10) {
-		t.Errorf("Expected %v, got %v", time.Duration(10), stats.MinRtt)
+	if stats.MinRTT != time.Duration(10) {
+		t.Errorf("Expected %v, got %v", time.Duration(10), stats.MinRTT)
 	}
-	if stats.MaxRtt != time.Duration(100000) {
-		t.Errorf("Expected %v, got %v", time.Duration(100000), stats.MaxRtt)
+	if stats.MaxRTT != time.Duration(100000) {
+		t.Errorf("Expected %v, got %v", time.Duration(100000), stats.MaxRTT)
 	}
-	if stats.AvgRtt != time.Duration(11585) {
-		t.Errorf("Expected %v, got %v", time.Duration(11585), stats.AvgRtt)
+	if stats.AvgRTT != time.Duration(11585) {
+		t.Errorf("Expected %v, got %v", time.Duration(11585), stats.AvgRTT)
 	}
-	if stats.StdDevRtt != time.Duration(29603) {
-		t.Errorf("Expected %v, got %v", time.Duration(29603), stats.StdDevRtt)
+	if stats.StdDevRTT != time.Duration(29603) {
+		t.Errorf("Expected %v, got %v", time.Duration(29603), stats.StdDevRTT)
 	}
 }
 
